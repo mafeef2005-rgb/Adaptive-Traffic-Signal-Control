@@ -95,7 +95,9 @@ The Tkinter interface provides:
 8. **Traffic Visualization**  
    The GUI displays the vehicle detections, lane information, traffic metrics and signal timing.
 
-Project Structure
+## Project Structure
+
+```text
 adaptive-traffic-signal-control/
 │
 ├── static/
@@ -109,35 +111,30 @@ adaptive-traffic-signal-control/
 ├── requirements.txt
 ├── README.md
 └── yolov8s.pt
+
 Installation
-
-Clone the repository:
-
+1. Clone the repository
 git clone https://github.com/YOUR-USERNAME/adaptive-traffic-signal-control.git
-
-Move into the project directory:
-
+2. Move into the project directory
 cd adaptive-traffic-signal-control
-
-Install the required Python packages:
-
+3. Install the required packages
 pip install -r requirements.txt
 
-The project was developed using Python and uses the YOLOv8 model provided in the repository.
+The project was developed using Python and uses the YOLOv8 model included in the repository.
 
 Running the Project
 
-Run the main Python application:
+Run the main application:
 
 python main.py
 
-The project can then be used with the available traffic video inputs and the GUI will display the detection and traffic analytics.
+The application can then be used with the available traffic video inputs. The GUI displays the vehicle detection results and traffic analytics.
 
 Results
 
-The project report compares different combinations of preprocessing and YOLOv8 detection.
+The project was tested using different combinations of image preprocessing techniques and YOLOv8 detection.
 
-The best reported configuration was the combination of morphological processing, HSV shadow removal and YOLOv8.
+The best-performing configuration was the combination of morphological processing, HSV shadow removal, and YOLOv8.
 
 Configuration	Detection Accuracy	False Positive Rate	FPS	Wait Time Reduction
 Gaussian Blur + YOLOv8	88%	25%	15	15%
@@ -145,25 +142,25 @@ Morphological Filtering + YOLOv8	91%	20%	17	20%
 HSV Shadow Removal + YOLOv8	93%	12%	18	22%
 Morphology + HSV + YOLOv8	95%	7%	20	25%
 
-These are results reported for the project's test scenarios and are not intended to represent production-level performance.
+Note: These results are based on the project's test scenarios and should not be considered production-level performance.
 
 Limitations
 
-The current system is a project-level implementation and still has some limitations:
+The current implementation has a few limitations:
 
-Detection performance can vary with camera angle and video quality.
-Heavy traffic and vehicle occlusion can affect detection.
-Shadow removal depends on HSV threshold values.
-The current implementation is primarily designed around lane-wise video inputs.
-Real-world deployment would require testing with live traffic data and actual signal hardware.
+Detection performance can vary depending on camera angle and video quality.
+Heavy traffic and vehicle occlusion can affect detection accuracy.
+Shadow removal depends on the selected HSV threshold values.
+The current system is primarily designed for lane-wise video inputs.
+Real-world deployment would require testing with live traffic data and actual traffic signal hardware.
 Future Scope
 
-Some possible improvements are:
+The project can be extended in several ways:
 
-Train or fine-tune the detector using local traffic datasets.
-Improve vehicle tracking across frames.
-Add reinforcement learning for longer-term traffic prediction.
-Coordinate multiple intersections instead of treating each junction independently.
-Combine camera data with IoT sensors.
-Deploy the system on edge devices.
-Add cloud-based traffic monitoring and logging.
+Fine-tune the YOLOv8 model using local traffic datasets.
+Improve vehicle tracking across consecutive frames.
+Use reinforcement learning for longer-term traffic prediction and signal optimization.
+Coordinate traffic signals across multiple intersections.
+Combine camera-based detection with IoT sensors.
+Deploy the system on edge devices for real-time processing.
+Add cloud-based traffic monitoring and data logging.
