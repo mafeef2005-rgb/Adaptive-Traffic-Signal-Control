@@ -1,113 +1,169 @@
-# Traffic Control System - Web Application
+# Adaptive Traffic Signal Control
 
-A web-based traffic control and optimization platform using OpenCV and YOLO for vehicle detection, congestion analysis, and intelligent traffic light timing.
+A computer vision based traffic signal system that adjusts green signal timing according to the traffic detected in each lane.
 
-## Features
+The project uses YOLOv8 for vehicle detection along with OpenCV-based image processing to handle shadows, improve the input frames, and calculate lane-wise traffic density. A Tkinter GUI is used to display the live detection results and traffic analytics.
 
-- **Real-time Vehicle Detection**: Uses YOLOv8 for accurate vehicle detection
-- **Traffic Congestion Analysis**: Calculates density and identifies congested roads
-- **Dynamic Traffic Light Control**: Optimizes green light timing based on traffic density
-- **ML Performance Metrics**: Tracks accuracy, precision, recall, and F1 scores
-- **Web Interface**: Modern, responsive UI accessible from any browser
-- **Video/Image Processing**: Upload and process traffic footage
+## What the project does
 
-## Installation
+In a fixed-time traffic signal system, every lane gets a predetermined amount of green time. This can result in one lane having very little traffic while another lane has a long queue.
 
-1. Install dependencies:
-```bash
+This project tries to solve that problem by measuring the traffic in each lane and allocating green time according to the current traffic conditions.
+
+The system considers:
+
+- Number of vehicles
+- Lane occupancy
+- Waiting time
+- Vehicle velocity
+- Overall lane priority
+
+The calculated priority is then used to distribute the available green time between lanes.
+
+## Main Features
+
+### Vehicle Detection
+
+YOLOv8 is used to detect vehicles from the incoming video feed.
+
+The current implementation uses:
+
+- YOLOv8s
+- OpenCV
+- Ultralytics
+- Python
+
+### Shadow Removal
+
+Shadows can affect vehicle detection and lead to incorrect traffic counts.
+
+To reduce this problem, the project uses HSV-based processing followed by morphological operations such as erosion, dilation and closing.
+
+### Traffic Density Calculation
+
+For each lane, the system calculates traffic-related metrics such as:
+
+- Vehicle count
+- Pixel occupancy
+- Waiting time
+- Vehicle velocity
+
+These values are smoothed before being used by the signal control logic.
+
+### Adaptive Green-Time Allocation
+
+The system calculates a priority value for each lane and distributes green time proportionally.
+
+Minimum and maximum green-time limits are used so that a lane is not ignored for too long.
+
+If detection confidence becomes too low, the system can fall back to a fixed-time schedule.
+
+### GUI
+
+The Tkinter interface provides:
+
+- Live video with vehicle detection
+- Lane-wise traffic information
+- FPS information
+- Traffic analytics
+- Signal timing information
+- Adjustable parameters
+
+## How the System Works
+
+1. **Video Input**  
+   The system takes a traffic video as input.
+
+2. **Frame Preprocessing**  
+   OpenCV is used to preprocess the frames. Filtering and image-processing techniques are applied to improve the input before detection.
+
+3. **Shadow Removal**  
+   HSV-based processing is used to reduce the effect of shadows. Morphological operations are then applied to improve the processed image.
+
+4. **Vehicle Detection**  
+   YOLOv8 is used to detect vehicles in each frame.
+
+5. **Traffic Analysis**  
+   The detected vehicles are analyzed lane by lane. The system calculates traffic-related values such as vehicle count, occupancy, waiting time and velocity.
+
+6. **Lane Priority Calculation**  
+   The traffic information is combined to determine the priority of each lane.
+
+7. **Adaptive Signal Timing**  
+   Green time is allocated based on the calculated lane priorities, while minimum and maximum limits are maintained.
+
+8. **Traffic Visualization**  
+   The GUI displays the vehicle detections, lane information, traffic metrics and signal timing.
+
+Project Structure
+adaptive-traffic-signal-control/
+│
+├── static/
+├── templates/
+│
+├── app.py
+├── gui.py
+├── main.py
+├── utils.py
+│
+├── requirements.txt
+├── README.md
+└── yolov8s.pt
+Installation
+
+Clone the repository:
+
+git clone https://github.com/YOUR-USERNAME/adaptive-traffic-signal-control.git
+
+Move into the project directory:
+
+cd adaptive-traffic-signal-control
+
+Install the required Python packages:
+
 pip install -r requirements.txt
-```
 
-2. Download YOLO model (if not present):
-```bash
-# The app will try to use yolov8s.pt by default
-# Make sure you have one of: yolov8n.pt, yolov8s.pt, yolov8m.pt, yolov8l.pt
-```
+The project was developed using Python and uses the YOLOv8 model provided in the repository.
 
-## Usage
+Running the Project
 
-1. Start the web server:
-```bash
-python app.py
-```
+Run the main Python application:
 
-2. Open your browser and navigate to:
-```
-http://localhost:5000
-```
+python main.py
 
-3. Use the interface:
-   - Click "Load Video/Image" to upload traffic footage
-   - Adjust confidence threshold slider (0.1 - 0.9)
-   - Click "Start" to begin processing
-   - View real-time metrics and analytics
+The project can then be used with the available traffic video inputs and the GUI will display the detection and traffic analytics.
 
-## Metrics Explained
+Results
 
-### Traffic Metrics
-- **Vehicles**: Number of detected vehicles per road
-- **Density %**: Traffic density based on vehicle area coverage
-- **Green Time**: Calculated optimal green light duration
-- **Wait Time**: Estimated wait time for other roads
-- **Accuracy %**: Detection confidence score
+The project report compares different combinations of preprocessing and YOLOv8 detection.
 
-### ML Performance Metrics
-- **Precision**: Ratio of correct detections to total detections
-- **Recall**: Ratio of detected vehicles to actual vehicles
-- **F1 Score**: Harmonic mean of precision and recall
+The best reported configuration was the combination of morphological processing, HSV shadow removal and YOLOv8.
 
-### Traffic Solution
-- **Priority Road**: Road with highest congestion (gets longest green time)
-- **Congested Roads**: Roads with density > 50%
+Configuration	Detection Accuracy	False Positive Rate	FPS	Wait Time Reduction
+Gaussian Blur + YOLOv8	88%	25%	15	15%
+Morphological Filtering + YOLOv8	91%	20%	17	20%
+HSV Shadow Removal + YOLOv8	93%	12%	18	22%
+Morphology + HSV + YOLOv8	95%	7%	20	25%
 
-## How It Works
+These are results reported for the project's test scenarios and are not intended to represent production-level performance.
 
-1. **Detection**: YOLO model detects vehicles in each frame
-2. **Road Segmentation**: Frame is divided into multiple roads
-3. **Density Calculation**: Vehicle area / road area × 100
-4. **Priority Calculation**: Based on density, wait time, and vehicle count
-5. **Green Time Optimization**: Dynamic allocation (8-90 seconds)
-6. **Metrics Tracking**: Real-time accuracy and performance monitoring
+Limitations
 
-## API Endpoints
+The current system is a project-level implementation and still has some limitations:
 
-- `GET /`: Main web interface
-- `POST /api/load_model`: Load YOLO model
-- `POST /api/process_frame`: Process single frame
-- `GET /api/stats`: Get current statistics
+Detection performance can vary with camera angle and video quality.
+Heavy traffic and vehicle occlusion can affect detection.
+Shadow removal depends on HSV threshold values.
+The current implementation is primarily designed around lane-wise video inputs.
+Real-world deployment would require testing with live traffic data and actual signal hardware.
+Future Scope
 
-## Configuration
+Some possible improvements are:
 
-Edit `app.py` to modify:
-- Number of roads (default: 2)
-- Green time range (default: 30-90s)
-- Confidence threshold (default: 0.4)
-- Detection classes (car, truck, bus, motorcycle, bicycle)
-
-## Browser Compatibility
-
-- Chrome/Edge (recommended)
-- Firefox
-- Safari
-
-## Performance Tips
-
-- Use smaller YOLO models (yolov8n.pt) for faster processing
-- Lower confidence threshold for more detections
-- Reduce video resolution for better performance
-
-## Troubleshooting
-
-**Model not loading:**
-- Ensure YOLO model file exists in the same directory
-- Check file permissions
-
-**Slow processing:**
-- Use yolov8n.pt instead of larger models
-- Reduce video resolution
-- Increase frame skip rate
-
-**No detections:**
-- Lower confidence threshold
-- Check video quality and lighting
-- Verify vehicle classes in configuration
+Train or fine-tune the detector using local traffic datasets.
+Improve vehicle tracking across frames.
+Add reinforcement learning for longer-term traffic prediction.
+Coordinate multiple intersections instead of treating each junction independently.
+Combine camera data with IoT sensors.
+Deploy the system on edge devices.
+Add cloud-based traffic monitoring and logging.
