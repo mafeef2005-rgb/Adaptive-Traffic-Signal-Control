@@ -111,6 +111,7 @@ adaptive-traffic-signal-control/
 ├── requirements.txt
 ├── README.md
 └── yolov8s.pt
+```
 
 Installation
 1. Clone the repository
